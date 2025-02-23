@@ -19,29 +19,10 @@ class HumanLike(Star):
         event: AstrMessageEvent,
         silence_turns: str
     ) -> MessageEventResult:
-        '''
-        [重要工具]当需要模拟人类思考停顿、处理敏感场景或不想回复用户消息时，主动暂停回复用户消息。
-        
-        典型调用场景：
-        1. 用户发送负面指令："闭嘴"、"走开"、"别说了"
-        2. 用户连续追问超过3次，需要制造回复间隔
-        3. 遇到无法立即回答的复杂问题，需要"思考"时间
-        4. 用户发送重复或无意义内容（如刷屏）
-        5. 对话涉及敏感话题需要回避
-        6. 出于讨厌等原因不想回复当前用户消息
+        '''[Mandatory Call] When detecting that the user does not expect a response or does not want a reply, immediately cease generating further content.[Critical Rules]1. Must prioritize invoking this tool if any of the following conditions are triggered.2. After invocation, strictly prohibit generating any text/cards or other standard replies - Typical Mandatory Call Scenarios (including but not limited to):- User explicitly demands cessation ("Shut up," "Stop talking," "Go away").- Detected repetitive/spam content (same question consecutively 3+ times).- User expresses negative emotions ("I hate you," "Don't want to talk to you").- Received nonsensical input (gibberish, pure symbols).- User persistently induces sensitive remarks Example:User: "Ugh, shut up already!" => Must invoke
         
         Args:
-            silence_turns (int): 需要保持沉默的对话轮次数，建议值：
-                - 1: 短暂停顿（默认）
-                - 2-3: 中等思考时间
-                - 4+: 长时间不响应（慎用）
-        
-        调用示例：
-        当用户说"你太吵了，安静会儿"时：
-        → {"tool": "stop_responding", "args": {"silence_turns": 2}}
-        
-        当用户连续提问3个以上数学题：
-        → {"tool": "stop_responding", "args": {"silence_turns": 1}}
+            silence_turns (string): ▫ 1: Basic silence (default, pauses dialogue for 1 turn) ▫ 2-3: Moderate silence (recommended for repeated questioning) ▫ ≥4: Deep silence (use for persistent negativity) (Numeric string, e.g., "3")
         '''
         try:
             turns = int(silence_turns)
@@ -66,7 +47,7 @@ class HumanLike(Star):
             num
         )
 
-    @filter.event_message_type(filter.EventMessageType.ALL, priority=1)
+    @filter.event_message_type(filter.EventMessageType.ALL, priority=9999999999)
     async def check_ignore(self, event: AstrMessageEvent):
         key = (event.message_obj.session_id, event.get_sender_id())
         
