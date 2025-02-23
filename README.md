@@ -45,14 +45,6 @@
 - 💡 提出新功能建议
 - 🔧 提交 Pull Request 改进代码
 
-## 👨‍💻 作者
-
-[anka](https://github.com/anka-afk)
-
-## 📄 许可证
-
-[MIT](LICENSE)
-
 ## 🌟 鸣谢
 
 感谢所有为这个项目做出贡献的开发者！
