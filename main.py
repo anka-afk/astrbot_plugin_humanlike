@@ -19,10 +19,10 @@ class HumanLike(Star):
         event: AstrMessageEvent,
         silence_turns: str
     ) -> MessageEventResult:
-        '''[Mandatory Call] When detecting that the user does not expect a response or does not want a reply, immediately cease generating further content.[Critical Rules]1. Must prioritize invoking this tool if any of the following conditions are triggered.2. After invocation, strictly prohibit generating any text/cards or other standard replies - Typical Mandatory Call Scenarios (including but not limited to):- User explicitly demands cessation ("Shut up," "Stop talking," "Go away").- Detected repetitive/spam content (same question consecutively 3+ times).- User expresses negative emotions ("I hate you," "Don't want to talk to you").- Received nonsensical input (gibberish, pure symbols).- User persistently induces sensitive remarks Example:User: "Ugh, shut up already!" => Must invoke
+        '''[Mandatory Call] Immediately cease generating content when detecting the user does not expect a response.[Critical Rules]1. Prioritize invoking this tool if any condition is triggered.2. Prohibit generating text/cards after invocation.3. Automatically escalate silence level for consecutive triggers (increment by 1 level per round) - Typical Scenarios (including but not limited to):- User explicitly demands cessation ("Shut up", "Stop talking", "Go away").- Detected repetitive/spam content (same question 3+ times consecutively).- User expresses negative emotions ("I hate you", "Don't want to talk to you").- Received nonsensical input (gibberish/pure symbols).- User persistently induces sensitive remarks Example:User: "Ugh shut up!" => Must invoke (first trigger silence_turns=1) User: "Stop replying!" => Must invoke (second trigger silence_turns=2)
         
         Args:
-            silence_turns (string): ▫ 1: Basic silence (default, pauses dialogue for 1 turn) ▫ 2-3: Moderate silence (recommended for repeated questioning) ▫ ≥4: Deep silence (use for persistent negativity) (Numeric string, e.g., "3")
+            silence_turns (string): ▫ 1: Basic silence (default, 1-turn pause) ▫ 2-3: Moderate silence (auto-calculated based on consecutive trigger count) ▫ ≥4: Deep silence (auto-applied for persistent triggers) (Numeric string, e.g., "2" indicates system-auto-calculated level 2)
         '''
         try:
             turns = int(silence_turns)
