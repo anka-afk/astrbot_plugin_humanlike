@@ -38,7 +38,6 @@ class HumanLike(Star):
         
 
     @filter.command("ignore")
-    @filter.permission_type(filter.PermissionType.ADMIN)
     async def cmd_ignore(self, event: AstrMessageEvent, num: int):
         '''忽略当前用户消息 /ignore <数量>'''
         self._set_ignore(
