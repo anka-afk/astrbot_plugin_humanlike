@@ -3,10 +3,9 @@ from astrbot.api.event import filter, ResultContentType
 from astrbot.api.all import (
     Context, Star, register, Plain, MessageChain, AstrMessageEvent, MessageEventResult
 )
-from .core.punctuation_handler import handle_punctuation
 import random
-import re
 import asyncio
+
 @register("astrbot_humanlike", "anka", "让ai更像真人", "1.0.0")
 class HumanLike(Star):
     def __init__(self, context: Context, config: dict = None):
@@ -17,6 +16,61 @@ class HumanLike(Star):
     def _set_ignore(self, session_id: str, user_id: str, num: int):
         key = (session_id, user_id)
         self.ignore_list[key] = num
+
+    async def _handle_punctuation(self, event: AstrMessageEvent):
+        result = event.get_result()
+        if not result:
+            return
+
+        try:
+            original_chain = result.chain
+            text_result = event.make_result().set_result_content_type(
+                ResultContentType.LLM_RESULT
+            )
+            
+            # 去除指定的标点符号
+            punctuation_config = self.config.get("Punctuation", {})
+            delete_punctuation = punctuation_config.get("Delete_Punctuation", True)
+            punctuation_list = punctuation_config.get("Punctuation_List", ["。", "！", "？", "；"])
+            
+            if original_chain:
+                if isinstance(original_chain, str):
+                    text = original_chain
+                    if delete_punctuation:
+                        for punct in punctuation_list:
+                            text = text.replace(punct, "")
+                    text_result = text_result.message(text)
+                elif isinstance(original_chain, MessageChain):
+                    for component in original_chain:
+                        if isinstance(component, Plain):
+                            text = component.text
+                            if delete_punctuation:
+                                for punct in punctuation_list:
+                                    text = text.replace(punct, "")
+                            text_result = text_result.message(text)
+                        else:
+                            text_result = text_result.message(component)
+                elif isinstance(original_chain, list):
+                    for component in original_chain:
+                        if isinstance(component, Plain):
+                            text = component.text
+                            if delete_punctuation:
+                                for punct in punctuation_list:
+                                    text = text.replace(punct, "")
+                            text_result = text_result.message(text)
+                        else:
+                            text_result = text_result.message(component)
+
+            if text_result.get_plain_text().strip() or len(text_result.chain) > 0:
+                event.set_result(text_result)
+            else:
+                await self.after_message_sent(event)
+                event.stop_event()
+
+        except Exception as e:
+            self.logger.error(f"处理文本失败: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
 
     @filter.llm_tool(name="stop_responding")
     async def llm_ignore_tool(
@@ -70,7 +124,7 @@ class HumanLike(Star):
                 del self.ignore_list[key]
                 
         # 标点符号处理
-        await self.handle_punctuation(self, event)
+        await self._handle_punctuation(event)
         
         # 随机发言延迟
         if self.config.get("Late_Interventions", {}).get("Enable_Late_Interventions", False):
