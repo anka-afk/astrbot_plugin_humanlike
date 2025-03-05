@@ -1,0 +1,90 @@
+{
+  "Ignore_Randomly": {
+    "description": "随机忽略用户消息设置",
+    "type": "object",
+    "hint": "随机忽略用户消息设置",
+    "items": {
+      "Enable_Ignore_Randomly": {
+        "description": "是否启用随机忽略用户消息",
+        "type": "bool",
+        "hint": "如果为true，则启用随机忽略用户消息",
+        "default": true
+      },
+      "Ignore_Probability": {
+        "description": "忽略概率",
+        "type": "int",
+        "hint": "忽略概率, 0-100",
+        "default": 10
+      }
+    }
+  },
+  "Punctuation": {
+    "description": "符号设置",
+    "type": "object",
+    "hint": "符号设置",
+    "items": {
+      "Delete_Punctuation": {
+        "description": "是否删除标点符号",
+        "type": "bool",
+        "hint": "如果为true，则删除标点符号",
+        "default": true
+      },
+      "Punctuation_List": {
+        "description": "删除的标点符号列表",
+        "type": "list",
+        "hint": "删除的标点符号列表",
+        "default": ["。", "！", "？", "；"]
+      }
+    }
+  },
+  "Sleep_Config": {
+    "description": "睡眠配置",
+    "type": "object",
+    "hint": "睡眠配置",
+    "items": {
+      "Astrbot_Sleep": {
+        "description": "是否让ai睡觉",
+        "type": "bool",
+        "hint": "如果为true，则让ai睡觉",
+        "default": true
+      },
+      "Astrbot_Sleep_Time": {
+        "description": "ai睡觉时间, 为一个区间, 24小时制, 例如: 22:00-08:00",
+        "type": "string",
+        "hint": "ai睡觉时间, 为一个区间, 24小时制, 例如: 22:00-08:00",
+        "default": "22:00-08:00"
+      }
+    }
+  },
+  "Late_Interventions": {
+    "description": "发言延迟设置",
+    "type": "object",
+    "hint": "发言延迟设置",
+    "items": {
+      "Enable_Late_Interventions": {
+        "description": "是否启用发言延迟",
+        "type": "bool",
+        "hint": "如果为true，则启用发言延迟",
+        "default": false
+      },
+      "Late_Interventions_Time": {
+        "description": "发言延迟时间,从列表中抽取, 单位为秒",
+        "type": "list",
+        "hint": "发言延迟时间,从列表中抽取, 单位为秒",
+        "default": [1, 2, 3]
+      },
+      "Random_Late_Interventions_Time": {
+        "description": "是否随机发言延迟时间, 如果启用, 则使用随机的发言时间区间, 而不是从列表中抽取",
+        "type": "bool",
+        "hint": "如果为true，则随机发言延迟时间",
+        "default": true
+      },
+      "Random_Late_Interventions_Time_Range": {
+        "description": "随机发言延迟时间区间, 如果启用随机发言延迟时间, 则使用随机的发言时间区间, 而不是从列表中抽取",
+        "type": "string",
+        "hint": "随机发言延迟时间区间, 例如: 1-10",
+        "default": "1-10"
+      }
+    }
+  }
+}

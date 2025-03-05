@@ -1,13 +1,17 @@
 from collections import defaultdict
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
-from astrbot.api.star import Context, Star, register
-from astrbot.api.all import *
-
+from astrbot.api.event import filter, ResultContentType
+from astrbot.api.all import (
+    Context, Star, register, Plain, MessageChain, AstrMessageEvent, MessageEventResult
+)
+import random
+import re
+import asyncio
 @register("astrbot_humanlike", "anka", "让ai更像真人", "1.0.0")
 class HumanLike(Star):
     def __init__(self, context: Context, config: dict = None):
         super().__init__(context)
         self.ignore_list = defaultdict(int)
+        self.config = self.context.get_config()
 
     def _set_ignore(self, session_id: str, user_id: str, num: int):
         key = (session_id, user_id)
@@ -48,6 +52,13 @@ class HumanLike(Star):
 
     @filter.event_message_type(filter.EventMessageType.ALL, priority=9999999999)
     async def check_ignore(self, event: AstrMessageEvent):
+        # 随机忽略消息
+        if self.config.get("Ignore_Randomly", {}).get("Enable_Ignore_Randomly", False):
+            if random.randint(0, 100) < self.config.get("Ignore_Randomly", {}).get("Ignore_Probability", 10):
+                event.stop_event()
+                return
+        
+        # 忽略用户消息
         key = (event.message_obj.session_id, event.get_sender_id())
         
         if self.ignore_list.get(key, 0) > 0:
@@ -56,3 +67,24 @@ class HumanLike(Star):
             
             if self.ignore_list[key] <= 0:
                 del self.ignore_list[key]
+                
+        # 标点符号处理
+        await self.handle_punctuation(self, event)
+        
+        # 随机发言延迟
+        if self.config.get("Late_Interventions", {}).get("Enable_Late_Interventions", False):
+            if self.config.get("Late_Interventions", {}).get("Random_Late_Interventions_Time", False):
+                # 随机发言延迟, 从区间抽取
+                random_late_interventions_time_range = self.config.get("Late_Interventions", {}).get("Random_Late_Interventions_Time_Range", "1-10")
+                random_late_interventions_time_range = random_late_interventions_time_range.split("-")
+                random_late_interventions_time = random.randint(int(random_late_interventions_time_range[0]), int(random_late_interventions_time_range[1]))
+                await asyncio.sleep(random_late_interventions_time)
+            else:
+                # 固定发言延迟, 从列表中抽取
+                random_late_interventions_time = random.choice(self.config.get("Late_Interventions", {}).get("Late_Interventions_Time", [1, 2, 3]))
+                await asyncio.sleep(random_late_interventions_time)
+
+
+    # @filter.on_llm_request()
+    # async def on_llm_request(self, event: AstrMessageEvent):
+        # 这里实现llm睡眠机制
