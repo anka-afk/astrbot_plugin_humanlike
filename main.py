@@ -3,6 +3,7 @@ from astrbot.api.event import filter, ResultContentType
 from astrbot.api.all import (
     Context, Star, register, Plain, MessageChain, AstrMessageEvent, MessageEventResult
 )
+from .core.punctuation_handler import handle_punctuation
 import random
 import re
 import asyncio
