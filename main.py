@@ -3,6 +3,7 @@ from astrbot.api.event import filter, ResultContentType
 from astrbot.api.all import (
     Context, Star, register, Plain, MessageChain, AstrMessageEvent, MessageEventResult
 )
+from astrbot.core import logger
 import random
 import asyncio
 
@@ -68,9 +69,9 @@ class HumanLike(Star):
                 event.stop_event()
 
         except Exception as e:
-            self.logger.error(f"处理文本失败: {str(e)}")
+            logger.error(f"处理文本失败: {str(e)}")
             import traceback
-            self.logger.error(traceback.format_exc())
+            logger.error(traceback.format_exc())
 
     @filter.llm_tool(name="stop_responding")
     async def llm_ignore_tool(
